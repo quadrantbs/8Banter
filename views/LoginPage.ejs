@@ -29,62 +29,44 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
+                    <li class="nav-item ">
                         <a class="nav-link" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users/register">Register</a>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="/users/register" data-toggle="modal" data-target="#registerModal">Register</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users/login">Login</a>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/users/login" data-toggle="modal" data-target="#loginModal">Login</a>
                     </li>
                 </ul>
             </div>
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero bg-light text-center py-5">
-        <div class="container">
-            <h2 class="display-4">Selamat Datang di Situs Kami!</h2>
-            <p class="lead">Temukan cara baru untuk membuat meme dan berbagi dengan teman-teman Anda.</p>
-            <a href="/users/register" class="btn btn-primary btn-lg">Daftar Sekarang</a>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features py-5">
-        <div class="container">
-            <h2 class="text-center mb-4">Fitur Kami</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Template Meme</h5>
-                            <p class="card-text">Gunakan berbagai template untuk membuat meme yang unik.</p>
-                        </div>
+    <div class="container" id="loginSection">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Login</h5>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Unggah Gambar</h5>
-                            <p class="card-text">Unggah gambar sendiri untuk membuat meme dengan lebih personal.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Berbagi dan Suka</h5>
-                            <p class="card-text">Bagikan meme Anda dengan teman-teman dan lihat berapa banyak yang
-                                menyukainya.</p>
-                        </div>
+                    <div class="card-body">
+                        <form action="/users/login" method="POST">
+                            <div class="form-group">
+                                <label for="loginEmail">Email</label>
+                                <input type="email" class="form-control" id="loginEmail" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Password</label>
+                                <input type="password" class="form-control" id="loginPassword" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-3">
@@ -96,6 +78,7 @@
             </ul>
         </div>
     </footer>
+
 </body>
 
 </html>

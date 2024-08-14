@@ -1,28 +1,70 @@
-const User = require('../models').User;
+const { User, Meme, Picture, Tag, Comment } = require('../models');
 const bcrypt = require('bcrypt');
+const { all } = require('../routes/users');
 
 class UserController {
+  static async registerPage(req, res) {
+    try {
+      res.render('RegisterPage');
+    } catch (error) {
+      res.redirect(`/?error=${error.toLocaleString()}`)
+      console.log(error);
+    }
+  }
   static async register(req, res) {
     try {
-      const { email, password, role } = req.body;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ email, password: hashedPassword, role });
-      res.status(201).json(user);
+      const { name, email, password } = req.body;
+      await User.create({ name, email, password, role: 'user' });
+      res.redirect('/users/login');
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.redirect(`/?error=${error.toLocaleString()}`)
+      console.log(error);
     }
   }
 
+  static async loginPage(req, res) {
+    try {
+      res.render('LoginPage');
+    } catch (error) {
+      res.redirect(`/?error=${error.toLocaleString()}`)
+      console.log(error);
+    }
+  }
   static async login(req, res) {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email } });
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ error: 'Invalid email or password' });
-      }
-      res.status(200).json({ message: 'Login successful', user });
+      await user.checkPassword(password);
+      const memes = await Meme.findAll({
+        include: [
+          {
+            model: Picture,
+            attributes: ['name', 'url'],
+          },
+          {
+            model: Tag,
+            through: { attributes: ['used'] },
+            attributes: ['id', 'name']
+          },
+          {
+            model: Comment,
+            include: {
+              model: User,
+              attributes: ['email']
+            },
+            attributes: ['content']
+          },
+          {
+            model: User,
+            attributes: ['name']
+          }
+        ]
+      });
+      console.log(memes[0].Picture);
+      res.render('Memes', { memes });
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 
@@ -33,6 +75,7 @@ class UserController {
       res.status(200).json(user);
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 
@@ -48,6 +91,7 @@ class UserController {
       res.status(200).json(user);
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 
@@ -59,6 +103,7 @@ class UserController {
       res.status(204).json();
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 }

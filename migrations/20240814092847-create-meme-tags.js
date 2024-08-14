@@ -9,10 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      memeId: {
+      MemeId: {
         type: Sequelize.INTEGER
       },
-      tagId: {
+      TagId: {
         type: Sequelize.INTEGER
       },
       createdAt: {

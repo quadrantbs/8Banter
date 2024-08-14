@@ -6,12 +6,12 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       // Definisikan asosiasi di sini
-      this.hasOne(models.Bio, { foreignKey: 'UserId' });
-      this.hasMany(models.Comment, { foreignKey: 'UserId' });
+      this.hasOne(models.Bio, { foreignKey: 'userId' });
+      this.hasMany(models.Comment, { foreignKey: 'userId' });
     }
 
-    async checkPassword(pass) {
-      if (!(await bcrypt.compare(pass, this.password))) {
+    async checkPassword(user, pass) {
+      if (!user || !(await bcrypt.compare(pass, this.password))) {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
     }

@@ -12,10 +12,10 @@ module.exports = {
       content: {
         type: Sequelize.TEXT
       },
-      userId: {
+      UserId: {
         type: Sequelize.INTEGER
       },
-      memeId: {
+      MemeId: {
         type: Sequelize.INTEGER
       },
       createdAt: {

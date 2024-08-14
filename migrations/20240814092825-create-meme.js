@@ -21,7 +21,7 @@ module.exports = {
       likes: {
         type: Sequelize.INTEGER
       },
-      userId: {
+      UserId: {
         type: Sequelize.INTEGER
       },
       PictureId: {

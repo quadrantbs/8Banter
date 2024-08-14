@@ -2,13 +2,13 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Picture extends Model {
+  class Tag extends Model {
     static associate(models) {
-      this.hasMany(models.Meme, { foreignKey: 'PictureId' });
+      this.belongsToMany(models.Meme, { through: models.MemeTag, foreignKey: 'tagId' });
     }
   }
 
-  Picture.init({
+  Tag.init({
     name: {
       type: DataTypes.STRING,
       validate: {
@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'Picture',
+    modelName: 'Tag',
   });
 
-  return Picture;
+  return Tag;
 };

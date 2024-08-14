@@ -15,7 +15,7 @@ module.exports = {
       biodata: {
         type: Sequelize.TEXT
       },
-      userId: {
+      UserId: {
         type: Sequelize.INTEGER
       },
       createdAt: {
