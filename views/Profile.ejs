@@ -50,7 +50,6 @@
         <h5>Name: <%= user.name %></h5>
         <p>Email: <%= user.email %></p>
         <p>Biodata: <%= user.Bio ? user.Bio.biodata : 'Kosong' %></p>
-
         <div class="d-flex justify-content-center mt-3">
           <a href="/users/profile/update/<%= user.id %>" class="btn btn-primary mx-2">Edit Profile</a>
           <form action="/users/profile/<%= user.id %>?_method=DELETE" method="POST" class="d-inline">

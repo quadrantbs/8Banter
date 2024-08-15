@@ -10,11 +10,6 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Comment, { foreignKey: 'UserId' });
     }
 
-    async checkPassword(pass) {
-      if (!(await bcrypt.compare(pass, this.password))) {
-        return res.status(401).json({ error: 'Invalid email or password' });
-      }
-    }
   }
 
   User.init({
@@ -23,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
-        notEmpty: { msg: "Name cannot be empty" }
+
+        notEmpty: { msg: "Name cannot be empty" },
       },
     },
     email: {
@@ -68,6 +64,11 @@ module.exports = (sequelize, DataTypes) => {
         const hashedPassword = await bcrypt.hash(user.password, 10);
         user.password = hashedPassword
       },
+    },
+    methods: {
+      isAdmin() {
+        return this.role === 'admin';
+      }
     }
   });
 

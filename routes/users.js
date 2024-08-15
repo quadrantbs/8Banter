@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController.js');
 const passport = require('passport');
+const ensureAuthenticated = require('../middleware/auth');
 
 // Routes for user
 router.get('/register', UserController.registerPage);
@@ -13,9 +14,9 @@ router.post('/login', passport.authenticate('local', {
     failureFlash: true
 }));
 router.get('/logout', UserController.logout);
-router.get('/profile/:id', UserController.getProfile); // Get user profile
-router.get('/profile/update/:id', UserController.getUpdateProfile); // Update user profile
-router.post('/profile/update/:id', UserController.postUpdateProfile); // Update user profile
+router.get('/profile/:id', ensureAuthenticated, UserController.getProfile); // Get user profile
+router.get('/profile/update/:id', ensureAuthenticated, UserController.getUpdateProfile); // Update user profile
+router.post('/profile/update/:id', ensureAuthenticated, UserController.postUpdateProfile); // Update user profile
 router.delete('/profile/:id', UserController.deleteProfile); // Delete user profile
 
 module.exports = router;
