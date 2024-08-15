@@ -1,4 +1,4 @@
-const Meme = require('../models').Meme;
+const { User, Meme, Picture, Tag, Comment } = require('../models');
 
 class MemeController {
   static async createMeme(req, res) {
@@ -13,8 +13,33 @@ class MemeController {
 
   static async getAllMemes(req, res) {
     try {
-      const memes = await Meme.findAll();
-      res.status(200).json(memes);
+      const memes = await Meme.findAll({
+        include: [
+          {
+            model: Picture,
+            attributes: ['name', 'url'],
+          },
+          {
+            model: Tag,
+            through: { attributes: ['used'] },
+            attributes: ['id', 'name']
+          },
+          {
+            model: Comment,
+            include: {
+              model: User,
+              attributes: ['name']
+            },
+            attributes: ['content']
+          },
+          {
+            model: User,
+            attributes: ['name']
+          }
+        ]
+      });
+
+      res.render('Memes', { memes, user: req.user })
     } catch (error) {
       res.status(400).json({ error: error.message });
     }

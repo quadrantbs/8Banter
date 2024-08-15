@@ -1,6 +1,5 @@
 const { User, Meme, Picture, Tag, Comment } = require('../models');
 const bcrypt = require('bcrypt');
-const { all } = require('../routes/users');
 
 class UserController {
   static async registerPage(req, res) {
@@ -15,9 +14,11 @@ class UserController {
     try {
       const { name, email, password } = req.body;
       await User.create({ name, email, password, role: 'user' });
+      req.flash('success_msg', 'Registration successful. Please login.');
       res.redirect('/users/login');
     } catch (error) {
-      res.redirect(`/?error=${error.toLocaleString()}`)
+      req.flash('error', error.message);
+      res.redirect('/users/register');
       console.log(error);
     }
   }
@@ -30,42 +31,15 @@ class UserController {
       console.log(error);
     }
   }
-  static async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ where: { email } });
-      await user.checkPassword(password);
-      const memes = await Meme.findAll({
-        include: [
-          {
-            model: Picture,
-            attributes: ['name', 'url'],
-          },
-          {
-            model: Tag,
-            through: { attributes: ['used'] },
-            attributes: ['id', 'name']
-          },
-          {
-            model: Comment,
-            include: {
-              model: User,
-              attributes: ['email']
-            },
-            attributes: ['content']
-          },
-          {
-            model: User,
-            attributes: ['name']
-          }
-        ]
-      });
-      console.log(memes[0].Picture);
-      res.render('Memes', { memes });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-      console.log(error);
-    }
+
+  static logout(req, res) {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      req.flash('success_msg', 'You are logged out.');
+      res.redirect('/users/login');
+    });
   }
 
   static async getProfile(req, res) {

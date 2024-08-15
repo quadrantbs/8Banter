@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -32,12 +33,24 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users/register">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users/login">Login</a>
-                    </li>
+                    <% if (user) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/memes/create/<%= user.id %>">Post a Meme</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/users/profile/<%= user.id %>">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/users/logout">Logout</a>
+                        </li>
+                        <% } else { %>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/users/register">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/users/login">Login</a>
+                            </li>
+                            <% } %>
                 </ul>
             </div>
         </nav>
@@ -62,12 +75,9 @@
                             </p>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <span>
-                                <%= meme.likes? meme.likes: '0' %> Likes
-                            </span>
                             <% meme.Tags.forEach(tag=> {%>
                                 <a href="/memes/tags/<%= tag.id %>" class="btn btn-secondary btn-sm">#<%= tag.name %>
-                                        </a>
+                                </a>
                                 <% }); %>
                                     <a href="/memes/<%= meme.id %>/comments" class="btn btn-primary btn-sm">Comment</a>
                         </div>
