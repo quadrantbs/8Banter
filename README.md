@@ -1,2 +1,2 @@
-# 8Bak
+# 8Banter
 Make your own memes and share it with other!
