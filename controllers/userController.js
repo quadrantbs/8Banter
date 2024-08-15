@@ -48,8 +48,8 @@ class UserController {
         include: [Bio],
       });
       if (!user) return res.status(404).json({ error: 'User not found' });
-      console.log(user.Bio.profilePicture)
-      res.render('Profile', { user }); // Render Profile.ejs dengan data user
+      console.log(user)
+      res.render('Profile', { user, userSession: req.user }); // Render Profile.ejs dengan data user
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -94,9 +94,8 @@ class UserController {
     try {
       const user = await User.findByPk(req.params.id);
       if (!user) return res.status(404).json({ error: 'User not found' });
-
       await user.destroy();
-      res.status(200).json({ message: 'Profile deleted successfully' });
+      res.redirect('/memes');
     } catch (error) {
       res.status(400).json({ error: error.message });
     }

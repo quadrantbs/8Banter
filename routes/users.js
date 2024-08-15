@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/userController.js');
 const passport = require('passport');
-const ensureAuthenticated = require('../middleware/auth');
+const ensureAuthenticated = require('../middleware/authenthication');
 
 // Routes for user
 router.get('/register', UserController.registerPage);

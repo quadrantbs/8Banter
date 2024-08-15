@@ -1,5 +1,4 @@
 const { User, Meme, Picture, Tag, Comment } = require('../models');
-const { Op } = require('sequelize');
 
 class MemeController {
 
@@ -64,7 +63,6 @@ class MemeController {
       if (tagIds.length > 0) {
         await newMeme.setTags(tagIds);
       }
-
       req.flash('success_msg', 'Meme created successfully!');
       res.redirect('/memes');
     } catch (error) {
@@ -75,37 +73,7 @@ class MemeController {
   static async getAllMemes(req, res) {
     try {
       const tagId = req.query.tagId;
-      const memes = await Meme.findAll({
-        include: [
-          {
-            model: Picture,
-            attributes: ['name', 'url'],
-          },
-          {
-            model: Tag,
-            through: { attributes: ['used'] },
-            attributes: ['id', 'name'],
-            where: tagId ? { id: { [Op.eq]: tagId } } : {},
-          },
-          {
-            model: Tag,
-            through: { attributes: ['used'] },
-            attributes: ['id', 'name'],
-          },
-          {
-            model: Comment,
-            include: {
-              model: User,
-              attributes: ['name'],
-            },
-            attributes: ['content'],
-          },
-          {
-            model: User,
-            attributes: ['name', 'id'],
-          },
-        ],
-      });
+      const memes = await Meme.getAllWithFilter(tagId)
       const memesWithTags = await Meme.findAll({
         include: [
           {
@@ -117,18 +85,48 @@ class MemeController {
       });
 
       const tags = await Tag.findAll();
-      // res.send(memes)
       res.render('Memes', { memes, memesWithTags, user: req.user, Meme, tags });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.send({ error: error.message });
+      console.log(error);
     }
   }
 
   static async getMemeById(req, res) {
     try {
-      const meme = await Meme.findByPk(req.params.id);
+      const meme = await Meme.findOne({
+        include: [
+          {
+            model: User,
+            attributes: ['name', 'id'],
+          },
+          {
+            model: Picture,
+            attributes: ['name', 'url'],
+          },
+          {
+            model: Tag,
+            attributes: ['id', 'name'],
+            through: { attributes: [] },
+          },
+          {
+            model: Comment,
+            include: {
+              model: User,
+              attributes: ['name'],
+            },
+            attributes: ['content'],
+          },
+        ],
+        where: {
+          id: req.params.id
+        }
+      });
       if (!meme) return res.status(404).json({ error: 'Meme not found' });
-      res.status(200).json(meme);
+      const tags = await Tag.findAll();
+      // res.send(meme)
+      console.log(meme.Tags);
+      res.render('MemeEdit', { meme, user: req.user, tags });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -139,12 +137,8 @@ class MemeController {
       const meme = await Meme.findByPk(req.params.id);
       if (!meme) return res.status(404).json({ error: 'Meme not found' });
       const { title, PictureId, topText, bottomText } = req.body;
-      if (title) meme.title = title;
-      if (PictureId) meme.PictureId = PictureId;
-      if (topText) meme.topText = topText;
-      if (bottomText) meme.bottomText = bottomText;
-      await meme.save();
-      res.status(200).json(meme);
+      await meme.update({ title, PictureId, topText, bottomText });
+      res.redirect('/memes');
     } catch (error) {
       res.status(400).json({ error: error.message });
     }

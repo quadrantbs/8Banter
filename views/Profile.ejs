@@ -51,9 +51,11 @@
         <p>Email: <%= user.email %></p>
         <p>Biodata: <%= user.Bio ? user.Bio.biodata : 'Kosong' %></p>
         <div class="d-flex justify-content-center mt-3">
+          <% if (userSession && (user.id == userSession.id || userSession.role == 'admin')) { %>
           <a href="/users/profile/update/<%= user.id %>" class="btn btn-primary mx-2">Edit Profile</a>
           <form action="/users/profile/<%= user.id %>?_method=DELETE" method="POST" class="d-inline">
             <button type="submit" class="btn btn-danger mx-2">Delete Profile</button>
+            <% } %>
           </form>
         </div>
       </div>

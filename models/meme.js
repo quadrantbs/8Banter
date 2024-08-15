@@ -1,5 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
+const { Op } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Meme extends Model {
@@ -23,16 +24,48 @@ module.exports = (sequelize, DataTypes) => {
 
     static formatDate(date) {
       const options = {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
       };
-      
+
       return new Intl.DateTimeFormat('id-ID', options).format(date).replace(',', '');
-  }
+    }
+
+    static async getAllWithFilter(tagId) {
+      const memes = await Meme.findAll({
+        include: [
+          {
+            model: sequelize.models.Picture,
+            attributes: ['name', 'url'],
+          },
+          {
+            model: sequelize.models.Tag,
+            through: { attributes: ['used'] },
+            attributes: ['id', 'name'],
+            where: tagId ? { id: { [Op.eq]: tagId } } : {},
+          },
+          {
+            model: sequelize.models.Comment,
+            include: {
+              model: sequelize.models.User,
+              attributes: ['name'],
+            },
+            attributes: ['content'],
+          },
+          {
+            model: sequelize.models.User,
+            attributes: ['name', 'id'],
+          },
+        ],
+      });
+      return memes;
+    }
+
+
   }
 
   Meme.init({
