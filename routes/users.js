@@ -15,7 +15,8 @@ router.post('/login', passport.authenticate('local', {
 }));
 router.get('/logout', UserController.logout);
 router.get('/profile/:id', ensureAuthenticated, UserController.getProfile); // Get user profile
-router.put('/profile/:id', UserController.updateProfile); // Update user profile
+router.get('/profile/update/:id', ensureAuthenticated, UserController.getUpdateProfile); // Update user profile
+router.post('/profile/update/:id', ensureAuthenticated, UserController.postUpdateProfile); // Update user profile
 router.delete('/profile/:id', UserController.deleteProfile); // Delete user profile
 
 module.exports = router;

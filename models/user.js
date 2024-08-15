@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
+
         notEmpty: { msg: "Name cannot be empty" },
       },
     },
