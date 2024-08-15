@@ -1,11 +1,73 @@
 const { User, Meme, Picture, Tag, Comment } = require('../models');
 
 class MemeController {
-  static async createMeme(req, res) {
+
+  static async createMemeGet(req, res) {
     try {
-      const { title, PictureId, topText, bottomText, userId } = req.body;
-      const meme = await Meme.create({ title, PictureId, topText, bottomText, userId });
-      res.status(201).json(meme);
+      const { UserId } = req.params;
+      const pictures = await Picture.findAll({
+        attributes: ['id', 'name', 'url']
+      });
+      const tags = await Tag.findAll({
+        attributes: ['id', 'name']
+      });
+      res.render('CreateMemeForm', { pictures, tags, UserId, user: req.user })
+    } catch (error) {
+      console.log(error);
+      req.flash('error', 'Something is wrong. lol.');
+      res.redirect('/memes/create');
+    }
+  }
+  static async createMemePost(req, res) {
+    try {
+      // Ambil UserId dari URL params
+      const UserId = req.params.UserId;
+
+      // Ambil data dari request body
+      let { title, PictureId, topText, bottomText, tags = [], newTagName, pictureName, pictureUrl } = req.body;
+      if (PictureId === "new") {
+        // Logika untuk menyimpan gambar baru ke database
+        const newPicture = await Picture.create({ name: pictureName, url: pictureUrl });
+        console.log(newPicture);
+        PictureId = newPicture.id; // Gunakan ID dari gambar baru untuk menyimpan meme
+      }
+      // Validasi apakah ada pictureId yang dipilih
+      if (!PictureId) {
+        req.flash('error', 'Please select a picture.');
+        return res.redirect(`/memes/create/${UserId}`);
+      }
+
+      // Proses untuk menambahkan tag baru jika ada
+      let tagIds = Array.isArray(tags) ? tags : [tags]; // Memastikan tags adalah array
+
+      if (newTagName) {
+        // Cek apakah tag baru sudah ada di database
+        const [newTag, created] = await Tag.findOrCreate({
+          where: { name: newTagName }
+        });
+        if (created) {
+          tagIds.push(newTag.id); // Tambahkan ID tag baru ke array tagIds
+        } else {
+          tagIds.push(newTag.id); // Jika sudah ada, tetap tambahkan ID-nya
+        }
+      }
+
+      // Buat meme baru dengan data yang diberikan
+      const newMeme = await Meme.create({
+        title,
+        PictureId,
+        topText,
+        bottomText,
+        UserId // Tambahkan UserId
+      });
+
+      // Hubungkan meme dengan tags yang ada
+      if (tagIds.length > 0) {
+        await newMeme.setTags(tagIds);
+      }
+
+      req.flash('success_msg', 'Meme created successfully!');
+      res.redirect('/memes');
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -38,7 +100,9 @@ class MemeController {
           }
         ]
       });
-
+      memes.forEach(e => {
+        console.log(e.Picture);
+      });
       res.render('Memes', { memes, user: req.user })
     } catch (error) {
       res.status(400).json({ error: error.message });
