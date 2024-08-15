@@ -1,4 +1,5 @@
 const { User, Meme, Picture, Tag, Comment } = require('../models');
+const { Op } = require('sequelize');
 
 class MemeController {
 
@@ -20,48 +21,46 @@ class MemeController {
   }
   static async createMemePost(req, res) {
     try {
-      // Ambil UserId dari URL params
       const UserId = req.params.UserId;
 
-      // Ambil data dari request body
       let { title, PictureId, topText, bottomText, tags = [], newTagName, pictureName, pictureUrl } = req.body;
       if (PictureId === "new") {
-        // Logika untuk menyimpan gambar baru ke database
         const newPicture = await Picture.create({ name: pictureName, url: pictureUrl });
         console.log(newPicture);
-        PictureId = newPicture.id; // Gunakan ID dari gambar baru untuk menyimpan meme
+        PictureId = newPicture.id;
       }
-      // Validasi apakah ada pictureId yang dipilih
       if (!PictureId) {
         req.flash('error', 'Please select a picture.');
         return res.redirect(`/memes/create/${UserId}`);
       }
 
-      // Proses untuk menambahkan tag baru jika ada
-      let tagIds = Array.isArray(tags) ? tags : [tags]; // Memastikan tags adalah array
+      let tagIds = Array.isArray(tags) ? tags : [tags];
 
       if (newTagName) {
-        // Cek apakah tag baru sudah ada di database
-        const [newTag, created] = await Tag.findOrCreate({
-          where: { name: newTagName }
-        });
-        if (created) {
-          tagIds.push(newTag.id); // Tambahkan ID tag baru ke array tagIds
-        } else {
-          tagIds.push(newTag.id); // Jika sudah ada, tetap tambahkan ID-nya
+        const newTags = newTagName.split(',').map(tag => tag.trim());
+
+        for (const tagName of newTags) {
+          if (tagName) {
+            const [newTag, created] = await Tag.findOrCreate({
+              where: { name: tagName }
+            });
+            if (created) {
+              tagIds.push(newTag.id);
+            } else {
+              tagIds.push(newTag.id);
+            }
+          }
         }
       }
 
-      // Buat meme baru dengan data yang diberikan
       const newMeme = await Meme.create({
         title,
         PictureId,
         topText,
         bottomText,
-        UserId // Tambahkan UserId
+        UserId
       });
 
-      // Hubungkan meme dengan tags yang ada
       if (tagIds.length > 0) {
         await newMeme.setTags(tagIds);
       }
@@ -75,6 +74,7 @@ class MemeController {
 
   static async getAllMemes(req, res) {
     try {
+      const tagId = req.query.tagId;
       const memes = await Meme.findAll({
         include: [
           {
@@ -84,26 +84,41 @@ class MemeController {
           {
             model: Tag,
             through: { attributes: ['used'] },
-            attributes: ['id', 'name']
+            attributes: ['id', 'name'],
+            where: tagId ? { id: { [Op.eq]: tagId } } : {},
+          },
+          {
+            model: Tag,
+            through: { attributes: ['used'] },
+            attributes: ['id', 'name'],
           },
           {
             model: Comment,
             include: {
               model: User,
-              attributes: ['name']
+              attributes: ['name'],
             },
-            attributes: ['content']
+            attributes: ['content'],
           },
           {
             model: User,
-            attributes: ['name']
-          }
-        ]
+            attributes: ['name', 'id'],
+          },
+        ],
       });
-      memes.forEach(e => {
-        console.log(e.Picture);
+      const memesWithTags = await Meme.findAll({
+        include: [
+          {
+            model: Tag,
+            through: { attributes: ['used'] },
+            attributes: ['id', 'name'],
+          },
+        ],
       });
-      res.render('Memes', { memes, user: req.user })
+
+      const tags = await Tag.findAll();
+      // res.send(memes)
+      res.render('Memes', { memes, memesWithTags, user: req.user, Meme, tags });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -140,7 +155,7 @@ class MemeController {
       const meme = await Meme.findByPk(req.params.id);
       if (!meme) return res.status(404).json({ error: 'Meme not found' });
       await meme.destroy();
-      res.status(204).json();
+      res.redirect('/');
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
