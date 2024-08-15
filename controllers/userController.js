@@ -1,4 +1,4 @@
-const { User, Meme, Picture, Tag, Comment } = require('../models');
+const { User, Meme, Picture, Tag, Comment, Bio } = require('../models');
 const bcrypt = require('bcrypt');
 
 class UserController {
@@ -44,40 +44,61 @@ class UserController {
 
   static async getProfile(req, res) {
     try {
-      const user = await User.findByPk(req.params.id);
+      const user = await User.findByPk(req.params.id, {
+        include: [Bio],
+      });
       if (!user) return res.status(404).json({ error: 'User not found' });
-      res.status(200).json(user);
+      console.log(user.Bio.profilePicture)
+      res.render('Profile', { user }); // Render Profile.ejs dengan data user
     } catch (error) {
       res.status(400).json({ error: error.message });
-      console.log(error);
+    }
+  }  
+
+  static async getUpdateProfile(req, res) {
+    try {
+      const user = await User.findByPk(req.params.id, {
+        include: Bio,
+      });
+      if (!user) return res.status(404).json({ error: 'User not found' });
+      res.render('updateProfile', { user });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
   }
 
-  static async updateProfile(req, res) {
+  static async postUpdateProfile(req, res) {
     try {
-      const user = await User.findByPk(req.params.id);
+      const { profilePicture, biodata } = req.body;
+      const userId = req.params.id;
+      
+      // console.log('Received data:', { profilePicture, biodata, userId });
+
+      const user = await User.findByPk(userId);
       if (!user) return res.status(404).json({ error: 'User not found' });
-      const { email, password, role } = req.body;
-      if (password) user.password = await bcrypt.hash(password, 10);
-      if (email) user.email = email;
-      if (role) user.role = role;
-      await user.save();
-      res.status(200).json(user);
-    } catch (error) {
+
+      let bio = await Bio.findOne({ where: { UserId: user.id } });
+      if (!bio) {
+          bio = await Bio.create({ profilePicture, biodata, UserId: user.id });
+      } else {
+          await bio.update({ profilePicture, biodata });
+      }
+
+      res.redirect(`/users/profile/${userId}`);
+  } catch (error) {
       res.status(400).json({ error: error.message });
-      console.log(error);
-    }
+  }
   }
 
   static async deleteProfile(req, res) {
     try {
       const user = await User.findByPk(req.params.id);
       if (!user) return res.status(404).json({ error: 'User not found' });
+
       await user.destroy();
-      res.status(204).json();
+      res.status(200).json({ message: 'Profile deleted successfully' });
     } catch (error) {
       res.status(400).json({ error: error.message });
-      console.log(error);
     }
   }
 }

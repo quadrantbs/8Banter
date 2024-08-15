@@ -10,5 +10,15 @@
     "passport-local": "^1.0.0",
     "pg": "^8.12.0",
     "sequelize": "^6.37.3"
-  }
+  },
+  "name": "8bak",
+  "version": "1.0.0",
+  "description": "Make your own memes and share it with other!",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
