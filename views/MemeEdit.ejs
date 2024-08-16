@@ -22,7 +22,7 @@
     <!-- Header -->
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="/">Logo</a>
+            <a class="navbar-brand" href="/">8Banter</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -80,22 +80,43 @@
                             <div class="form-group">
                                 <label for="picture">Picture</label>
                                 <div class="d-flex overflow-auto" style="white-space: nowrap; padding: 10px 0;">
+                                    <!-- Add New Picture Card -->
+                    <div class="card text-wrap" style="display: inline-block; width: 200px; margin-right: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Add New Picture</h5>
+                            <div class="form-group">
+                                <label for="pictureName">Name</label>
+                                <input type="text" id="pictureName" name="pictureName" class="form-control"
+                                    placeholder="Enter picture name">
+                            </div>
+                            <div class="form-group">
+                                <label for="pictureUrl">URL</label>
+                                <input type="url" id="pictureUrl" name="pictureUrl" class="form-control"
+                                    placeholder="Enter picture URL">
+                            </div>
+                            <!-- Radio button for selecting new picture -->
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="newPicture" name="PictureId" value="new">
+                                <label class="form-check-label" for="newPicture">New Picture</label>
+                            </div>
+                        </div>
+                    </div>
                                     <!-- Existing Pictures -->
-                                    <div class="card" style="display: inline-block; width: 200px; margin-right: 10px;">
-                                        <label for="picture<%= meme.PictureId %>"
-                                            style="cursor: pointer; display: block;">
-                                            <img src="<%= meme.Picture.dataValues.url %>" class="card-img-top"
-                                                alt="<%= meme.Picture.dataValues.name %>"
-                                                style="width: 100%; height: 150px; object-fit: cover;">
-                                            <div class="card-body text-center">
-                                                <h5 class="card-title" style="font-size: 1rem; margin: 0;">
-                                                    <input type="radio" id="picture<%= meme.PictureId %>"
-                                                        name="PictureId" value="<%= meme.PictureId %>" required checked>
-                                                    <%= meme.Picture.dataValues.name %>
-                                                </h5>
-                                            </div>
-                                        </label>
-                                    </div>
+                                    
+                                    <% pictures.forEach((picture) => { %>
+                                        <div class="card text-wrap" style="display: inline-block; width: 200px; margin-right: 10px;">
+                                            <label for="picture<%= picture.id %>" style="cursor: pointer; display: block;">
+                                                <img src="<%= picture.dataValues.url %>" class="card-img-top" alt="<%= picture.name %>"
+                                                    style="width: 100%; height: 150px; object-fit: cover;">
+                                                    <div class="card-body text-center">
+                                                        <h5 class="card-title d-flex align-items-center justify-content-center">
+                                                            <input type="radio" id="picture<%= picture.id %>" name="PictureId" value="<%= picture.id %>" required class="me-2 flex-shrink-0" <%= picture.id== meme.PictureId? 'checked' : '' %>>
+                                                            <span class="text-break"><%= picture.name %></span>
+                                                        </h5>
+                                                    </div>
+                                            </label>
+                                        </div>
+                                        <% }); %>
                                 </div>
                             </div>
 

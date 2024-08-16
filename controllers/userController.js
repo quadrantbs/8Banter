@@ -1,5 +1,4 @@
-const { User, Meme, Picture, Tag, Comment, Bio } = require('../models');
-const bcrypt = require('bcrypt');
+const { User, Bio } = require('../models');
 
 class UserController {
   static async registerPage(req, res) {
@@ -52,6 +51,7 @@ class UserController {
       res.render('Profile', { user, userSession: req.user }); // Render Profile.ejs dengan data user
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }  
 
@@ -63,7 +63,8 @@ class UserController {
       if (!user) return res.status(404).json({ error: 'User not found' });
       res.render('updateProfile', { user });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message });      
+      console.log(error);
     }
   }
 
@@ -87,6 +88,7 @@ class UserController {
       res.redirect(`/users/profile/${userId}`);
   } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
   }
   }
 
@@ -98,6 +100,7 @@ class UserController {
       res.redirect('/memes');
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 }

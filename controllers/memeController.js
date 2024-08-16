@@ -67,6 +67,7 @@ class MemeController {
       res.redirect('/memes');
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 
@@ -125,10 +126,13 @@ class MemeController {
       if (!meme) return res.status(404).json({ error: 'Meme not found' });
       const tags = await Tag.findAll();
       // res.send(meme)
-      console.log(meme.Tags);
-      res.render('MemeEdit', { meme, user: req.user, tags });
+      const pictures = await Picture.findAll({
+        attributes: ['id', 'name', 'url']
+      });
+      res.render('MemeEdit', { meme, user: req.user, tags, pictures });
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 
@@ -141,6 +145,7 @@ class MemeController {
       res.redirect('/memes');
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 
@@ -152,6 +157,7 @@ class MemeController {
       res.redirect('/');
     } catch (error) {
       res.status(400).json({ error: error.message });
+      console.log(error);
     }
   }
 }

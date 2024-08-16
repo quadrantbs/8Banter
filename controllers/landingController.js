@@ -7,7 +7,7 @@ class LandingController {
       const { error } = req.query;
       res.render('LandingPage', { error });
     } catch (error) {
-      console.error('Error rendering landing page:', error);
+      console.log(error);      
       res.status(500).send('Internal Server Error');
     }
   }
