@@ -1,2 +1,2 @@
-# [8Banter](https://banter-memes.web.app/)
+# 8Banter
 Make your own memes and share it with other!
